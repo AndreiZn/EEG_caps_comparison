@@ -1,1 +1,0 @@
-b3 = b2 - b1 label Rare minus Frequent difference wave
