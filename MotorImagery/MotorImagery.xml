@@ -9,7 +9,7 @@
     </Task>
     <Task ns:type="MultiTask" ID="MT_Trials" TaskOrder="Deterministic" SampleSize="160">
       <Task ns:type="MultiTask" ID="MT_Baseline" TaskOrder="RandomWithReplacement" SampleSize="1">
-        <Task ns:type="SingleTask" ID="ST_Baseline1" DurationSeconds="4.0" Group="0"/>
+        <Task ns:type="SingleTask" ID="ST_Baseline1" DurationSeconds="4" Group="0"/>
         <Task ns:type="SingleTask" ID="ST_Baseline2" DurationSeconds="4.2" Group="0"/>
         <Task ns:type="SingleTask" ID="ST_Baseline3" DurationSeconds="4.4" Group="0"/>
         <Task ns:type="SingleTask" ID="ST_Baseline4" DurationSeconds="4.6" Group="0"/>
