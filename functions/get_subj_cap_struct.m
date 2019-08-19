@@ -11,7 +11,7 @@ subjects = files(dirflag);
 num_sbj = length(subjects);
 
 %% brand analizing
-br_cells = cell(2,num_sbj);
+br_cells = cell(3,num_sbj);
 for i=1:num_sbj
     br_files = dir(fullfile(subjects(i).folder,subjects(i).name));
     dirflag = [br_files.isdir] & ~strcmp({br_files.name},'..') & ~strcmp({br_files.name},'.');
@@ -20,7 +20,8 @@ for i=1:num_sbj
     brands = {brands{1,:}};
     br_cells{1,i} = {subjects(i).name};
     br_cells{2,i} = brands;
+    br_cells{3,i} = fullfile(root_add,subjects(i).name);
 end
-fields = {'Subject','Devices'};
+fields = {'Subject','Devices','Root_Addr'};
 structure = cell2struct(br_cells,fields,1);
 end
