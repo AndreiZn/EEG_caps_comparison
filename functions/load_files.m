@@ -18,6 +18,8 @@ for i=1:num_subj
             for k=1:length(eeg_file)
                 curr_file = fullfile(curr_folder,eeg_file(k).name);
                 [y,~] = readCortexData(curr_file);
+                %% work to do with y
+                
             end
         elseif curr_dev == 'Neuroplay'
             eeg_file = dir(fullfile(curr_folder,'Exp*.edf'));
@@ -25,6 +27,8 @@ for i=1:num_subj
                 curr_file = fullfile(curr_folder,eeg_file(k).name);
                 y = load(curr_file);
                 y = y.y;
+                %% work to do with y
+                
             end
         end
         
