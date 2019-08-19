@@ -16,6 +16,7 @@ for i=1:num_subj
         if curr_dev == 'gNautilus'
             eeg_file = dir(fullfile(curr_folder,'Exp*.mat'));
             for k=1:length(eeg_file)
+                fprintf('\t\t\t\tCurrent file is: %s\n', eeg_file(k).name);
                 curr_file = fullfile(curr_folder,eeg_file(k).name);
                 y = load(curr_file);
                 y = y.y;
@@ -25,6 +26,7 @@ for i=1:num_subj
         elseif curr_dev == 'Neuroplay'
             eeg_file = dir(fullfile(curr_folder,'Exp*.edf'));
             for k=1:length(eeg_file)
+                fprintf('\t\t\t\tCurrent file is: %s\n', eeg_file(k).name);
                 curr_file = fullfile(curr_folder,eeg_file(k).name);
                 [y,~] = readCortexData(curr_file);
                 %% work to do with y
