@@ -21,6 +21,6 @@ for i=1:num_sbj
     br_cells{1,i} = {subjects(i).name};
     br_cells{2,i} = brands;
 end
-fields = {'Subjects','Devices'};
+fields = {'Subject','Devices'};
 structure = cell2struct(br_cells,fields,1);
 end
