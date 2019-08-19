@@ -20,7 +20,7 @@ for i=1:num_subj
                 y = load(curr_file);
                 y = y.y;
                 %% work to do with y
-                mean(y);
+                
             end
         elseif curr_dev == 'Neuroplay'
             eeg_file = dir(fullfile(curr_folder,'Exp*.edf'));
