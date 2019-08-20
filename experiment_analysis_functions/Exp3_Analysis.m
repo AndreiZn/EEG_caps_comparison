@@ -19,7 +19,7 @@ fig = gcf;
 chldrn = fig.Children; 
 ax = chldrn(3);
 xticks(ax, 1:srate*conf.time_step_to_plot:size(y,2));
-saveas(fig,'Exp3_Plot.png')
+saveas(fig,[conf.subject,'_',conf.curr_dev,'_Exp3_plot','.png'])
 close(gcf)
 
 
