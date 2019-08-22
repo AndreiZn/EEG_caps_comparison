@@ -39,7 +39,7 @@ for i=1:num_subj
                 exp_analysis(y,conf);
             end
         elseif conf.curr_dev == 'Neuroplay'
-            conf.sampling_rate = 150;
+            conf.sampling_rate = 125;
             conf.time_period_to_remove = 20;
             eeg_file = dir(fullfile(conf.curr_folder,'Exp*.edf'));
             for k=1:length(eeg_file)
