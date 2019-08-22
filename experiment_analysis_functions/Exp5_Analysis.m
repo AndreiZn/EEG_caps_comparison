@@ -1,6 +1,5 @@
-% Analysis of Experiment 3 (a subject was instructed to press the left mouse button whenever 
-% a red circle appeared on the screen)
-function Exp3_Analysis(y,conf)
+% Analysis of Experiment 5 (a subject was instructed to move his head slowly in random directions for ~1 minute)
+function Exp5_Analysis(y,conf)
 
 srate = conf.sampling_rate;
 assignin('base','y',y)
@@ -18,11 +17,3 @@ if ~exist(conf.output_dir, 'dir')
     mkdir(conf.output_dir)
 end
 Plot_EEG_data(EEG, conf);
-
-
-% 
-% %[spectopo_outputs] = pop_spectopo( EEG, dataflag, timerange, process, 'key', 'val',...); % returns spectopo() outputs
-% 
-% %output_set_name = [set_name, '_', output_suffix, '.set'];
-% %EEG = pop_saveset( EEG, 'filename',output_set_name,'filepath',output_folder_cur);
-% %EEG = eeg_checkset( EEG );
