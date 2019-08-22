@@ -26,7 +26,7 @@ for i=1:num_subj
         %% select device type
         if conf.curr_dev == 'gNautilus'
             conf.sampling_rate = 250;
-            conf.time_period_to_remove = 20;
+            conf.time_period_to_remove = 30;
             eeg_file = dir(fullfile(conf.curr_folder,'Exp*.mat'));
             for k=1:length(eeg_file)
                 conf.name = eeg_file(k).name;
@@ -40,7 +40,7 @@ for i=1:num_subj
             end
         elseif conf.curr_dev == 'Neuroplay'
             conf.sampling_rate = 125;
-            conf.time_period_to_remove = 20;
+            conf.time_period_to_remove = 2;
             eeg_file = dir(fullfile(conf.curr_folder,'Exp*.edf'));
             for k=1:length(eeg_file)
                 conf.name = eeg_file(k).name;
