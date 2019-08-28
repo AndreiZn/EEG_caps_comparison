@@ -1,0 +1,456 @@
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+<script src="http://www.flotcharts.org/javascript/jquery.flot.min.js"></script>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+<link href="https://fonts.googleapis.com/css?family=Roboto+Mono&amp;subset=latin,cyrillic" rel="stylesheet" type="text/css">
+<style>
+* { font-family: 'Roboto Condensed' }
+.emoheader { width: 100px; display: inline-block; }
+html { margin: 0; }
+body { margin: 40px; } 
+.code
+{
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+	white-space: pre;
+    background: #DDD;
+    border: 1px #BBB solid;
+    padding: 10px;
+    font-size: 12px;
+	margin-top: 5px;
+}
+
+.smallcode
+{
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    background: #DDD;
+    border: 1px #BBB solid;
+    padding: 2px;
+    font-size: 12px;
+	display: inline-block;
+}
+.request
+{
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+	white-space: pre;
+    background: #DDD;
+    border: 1px #BBB solid;
+    padding: 10px;
+    font-size: 12px;
+	border-left: #6d981e 10px solid;
+	margin: 5px 0;
+}
+
+.plot-container
+{
+	width: 1000px; 
+	height: 100px; 
+	background: white;
+}
+
+.plot
+{
+	width: 100%; 
+	height: 100%;
+}
+
+
+</style>
+<title>Кортекс API</title>
+</head>
+<body>
+<h1>Кортекс API</h1>
+
+
+
+<h3>1. Запрос информации</h3>
+<div class="request">http://127.0.0.1:336/getinfo</div>
+<div>Вариант ответа:</div>
+<div class="code" id="getinfo-container">{
+"result": "true",
+"frequency": "122",
+"channelAmount": "8",
+"channels": [
+	{"name":"ch1"},
+	{"name":"ch2"},
+	{"name":"ch3"},
+	{"name":"ch4"},
+	{"name":"ch5"},
+	{"name":"ch6"},
+	{"name":"ch7"},
+	{"name":"ch8"}
+]}</div>
+
+<h3>2. Запрос сырых данных</h3>
+<div class="request">http://127.0.0.1:336/getdata</div>
+<div>
+Ответ содержит массив сэмплов <span class="smallcode">data</span>, количество сэмплов <span class="smallcode">samples</span>.<br/>
+Каждый сэмпл содержит временную метку <span class="smallcode">t</span> (время в миллисекундах, сначала эпохи) и двойной массив данных <span class="smallcode">d</span>, составленный по каналам (например, <span class="smallcode">d[0]</span> - данные с первого канала).<br/>
+</div>
+<br/>
+<div><strong>Ответ:</strong> <span style="color: #999; font-size: 12px;"><span id="answer-getdata-time"></span> <input type="checkbox" id="answer-getdata-check" checked="checked">Обновлять текст</span></div>
+<div class="code" id="getdata-container" style="height: 300px; overflow: auto;">{
+"result": "true",
+"samples": "1",
+"data": [{
+	"t": "131139379242166781",
+	"d": [
+		[0, 70, 28, 34, 67, 12, 82, 24],
+		[-13, 46, 2, 18, 36, -5, 59, 5],
+		[-15, 93, 30, 36, 94, -5, 114, 8],
+		[-25, 79, 19, 24, 83, -15, 98, 1],
+		[-137, 114, -22, -47, 128, -149, 149, -83],
+		[44, -17, -2, 43, -45, 65, -40, 15],
+		[-132, 167, -10, 4, 169, -114, 209, -63],
+		[-110, 3, -109, -47, -63, -115, -16, -134]
+	]
+}]
+}</div>
+
+<!-- The future holder of graphics -->
+<div id="plotholder">
+</div>
+
+
+<script>
+//Server url
+var server = "http://127.0.0.1:336/";
+//Note, that "336" is almost like "EEG" ;)
+
+//UI
+var plots = []; //The graphics
+var datas = []; //The data
+var indexes = [];
+var totalPoints = 1000; //Max points on graphic
+var channels = 0;
+
+$(function() 
+{
+	//Starting timer	
+	window.setInterval(function() { updateEEGData() }, 500);
+});
+
+
+function updateEEGData() 
+{ 
+	if (plots.length == 0)
+	{
+		$.getJSON(server+"getinfo", function (data) 
+		{
+			if (data && data.result) //'result' should be true
+			{				
+				$("#getinfo-container").html(JSON.stringify(data, null, 2));
+			
+				channels = data.channelAmount;
+				if (channels > 0)
+				{
+					datas = [];
+									
+					//Creating plots
+					var html = "";
+					for (var i=0; i<channels; i++)
+					{
+						var data = [];						
+						for (var j =0; j< totalPoints; j++)
+						{
+							data.push(0);
+						}
+						//Building null data
+						datas[i] = data;
+						indexes[i] = 0;
+						
+						//The html elements which will hold the graphics
+						html += '<div class="plot-container"><div id="placeholder'+i+'" class="plot"></div></div>';
+					}
+					
+					$("#plotholder").html(html);
+					plots = [];
+					for (var i=0; i<channels; i++)
+					{
+								
+						var plot = $.plot("#placeholder"+i, [updateData(i)], 
+							{
+							series: { shadowSize: 0	/*Drawing is faster without shadows*/ },
+							yaxis: { min: -1000, max: 1000 },
+							xaxis: { show: false }
+						});
+						plots[i] = plot;
+					}
+				}
+			}
+		});
+	}
+	else
+	{	
+		//Sending request
+		$.getJSON(server+"getdata", function (data) 
+		{
+			if (data && data.result) //'result' should be true
+			{
+				if ($("#answer-getdata-check").is(':checked'))
+				{
+					$("#getdata-container").html(JSON.stringify(data, null, 2));
+				}
+				
+				$("#answer-getdata-time").html(nowString());
+			
+				//Data contains several samples as array
+				for (var i = 0; i<data.data.length; i++)
+				{					
+					var sample = data.data[i]; //One sample
+					var chData = sample.d; //Single channel data
+				
+					for (var j = 0; j<chData.length; j++)
+					{					
+						var plot = plots[j];		
+						plot.setData([updateData(j,chData[j])]);					
+					}				
+				}
+				
+				//Redrawing the plot
+				for (var j = 0; j<plots.length; j++)
+				{
+					plots[j].draw();
+				}							
+			}
+			
+		});
+	}
+}
+
+function updateData(index, values) 
+{	
+	var data = datas[index]; 
+	var ind = indexes[index];
+	if (values && values.length > 0)
+	{
+		//Writing values
+		var l = values.length;
+		for (var i = 0; i<l; i++)
+		{
+			data[ind] = values[i];
+			
+			ind++;
+			if (ind >= totalPoints) ind = 0; //From the beginning
+		}		
+		
+		indexes[index] = ind;
+		datas[index] = data;
+	}	
+	
+	//Preparing specially formatted array for the plot
+	var res = [];
+	for (var i = 0; i < data.length; ++i) 
+	{
+		res.push([i, data[i]]);
+	}	
+
+	return res;
+}
+</script>
+
+
+<h3>3. Запрос распознанных состояний от Portal</h3>
+<div class="request">http://127.0.0.1:336/getstates</div>
+<div>
+Ответ содержит массив состояний <span class="smallcode">states</span>, их количество <span class="smallcode">amount</span>.<br/>
+Каждое состояние содержит номер <span class="smallcode">state</span> (0...8) и временную метку <span class="smallcode">t</span> (время в миллисекундах, сначала эпохи) <br/>
+</div>
+<div>Вариант ответа:</div>
+<div class="code">{
+"result": "true",
+"amount": "2",
+"states": 
+	[
+	{"state": "1", "t": "131139379242166781" }
+	{"state": "2", "t": "131139379242167123" }
+	{"state": "3", "t": "131139379242168651" }
+	]
+}</div>
+
+<div id="plotstateholder">
+<div class="plot-container" style="height: 200px;">
+<div id="stateplot" class="plot">
+</div>
+</div>
+</div>
+
+<script>
+//UI
+var stateplot; //The graphics
+var statedata = [] //The data
+var stateindex = 0;
+var statetotalPoints = 100; //Max points on graphic
+
+$(function() 
+{
+	for (var i =0; i<statetotalPoints; i++)
+	{
+		statedata.push(0);
+	}
+
+	stateplot = $.plot("#stateplot", [updateStateData()], 
+							{
+							series: { shadowSize: 0	/*Drawing is faster without shadows*/ },
+							yaxis: { min: 0, max: 8 },
+							xaxis: { show: true }
+						});
+	
+	//Starting timer	
+	window.setInterval(updateStatesData, 500);
+});
+
+
+function updateStatesData() 
+{ 
+
+	//Sending request
+	$.getJSON(server+"getstate", function (data) 
+	{	
+		if (data && data.result) //'result' should be true
+		{
+			var states = [];
+			//Data contains several samples as array
+			for (var i = 0; i<data.states.length; i++)
+			{					
+				states.push(data.states[i].state);			
+			}			
+		
+			//Redrawing the plot
+			stateplot.setData([updateStateData(states)]);
+			stateplot.draw();					
+		}		
+	});
+	
+	$.getJSON(server+"getlaststate", function (data) 
+	{			
+		if (data && data.result) //'result' should be true
+		{
+			$("#laststate").html(data.state);					
+		}		
+	});
+
+}
+
+function updateStateData(values) 
+{	
+	
+	if (values && values.length > 0)
+	{
+		//Writing values
+		var l = values.length;
+		for (var i = 0; i<l; i++)
+		{
+			statedata[stateindex] = values[i];			
+			stateindex++;
+			if (stateindex >= statetotalPoints) stateindex = 0; //From the beginning
+		}		
+	}	
+
+	//Preparing specially formatted array for the plot
+	var res = [];
+	for (var i = 0; i < statedata.length; ++i) 
+	{
+		res.push([i, statedata[i]]);
+	}	
+
+	return res;
+}
+
+function pad(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+function nowString()
+{
+var d = new Date();
+return pad(d.getHours(),2) + ":" + pad(d.getMinutes(),2) + ":" + pad(d.getSeconds(),2) + "." + pad(d.getMilliseconds(),3);
+}
+
+</script>
+
+
+<h3>4. Запрос последнего распознанного состояния от Portal</h3>
+<div class="request">http://127.0.0.1:336/getlaststate</div>
+<div>Вариант ответа:</div>
+<div class="code">{
+"result": "true",
+"state": "2",
+"t": "131139379242166781"
+}</div>
+
+<div id="laststate">
+Последнее состояние: <span id="laststate">?</span>
+</div>
+
+<h3>5. Получение спектров</h3>
+<div class="request">http://127.0.0.1:336/getlastspectrum</div>
+<div>
+Ответ содержит массив сэмплов <span class="smallcode">data</span>, количество сэмплов <span class="smallcode">samples</span>.<br/>
+Каждый сэмпл содержит временную метку <span class="smallcode">t</span> (время в миллисекундах, сначала эпохи) и двойной массив данных <span class="smallcode">d</span>, составленный по каналам (например, <span class="smallcode">d[0]</span> - данные с первого канала).<br/>
+</div>
+<br/>
+<div><strong>Ответ:</strong> <span style="color: #999; font-size: 12px;"><span id="answer-getlastspectrum-time"></span> <input type="checkbox" id="answer-getlastspectrum-check" checked="checked">Обновлять текст</span></div>
+<div class="code" id="getlastspectrum-container" style="height: 300px; overflow: auto;">{
+"result": "true",
+"samples": "1",
+"data": [{
+	"t": "131139379242166781",
+	"d": [
+		[0, 70, 28, 34, 67, 12, 82, 24],
+		[-13, 46, 2, 18, 36, -5, 59, 5],
+		[-15, 93, 30, 36, 94, -5, 114, 8],
+		[-25, 79, 19, 24, 83, -15, 98, 1],
+		[-137, 114, -22, -47, 128, -149, 149, -83],
+		[44, -17, -2, 43, -45, 65, -40, 15],
+		[-132, 167, -10, 4, 169, -114, 209, -63],
+		[-110, 3, -109, -47, -63, -115, -16, -134]
+	]
+}]
+}</div>
+
+<!-- The future holder of graphics -->
+<div id="plotholder-spectrum">
+</div>
+
+
+<script>
+//UI
+var plotsSpectrum = []; //The graphics
+var datasSpectrum = []; //The data
+var indexesSpectrum = [];
+
+$(function() 
+{
+	//Starting timer	
+	window.setInterval(function() { updateSpectrum() }, 500);
+});
+
+
+function updateSpectrum() 
+{ 
+	//if (plotsSpectrum.length > 0)
+	//{
+		//Sending request
+		$.getJSON(server+"getlastspectrum", function (data) 
+		{
+			if (data && data.result) //'result' should be true
+			{
+				if ($("#answer-getlastspectrum-check").is(':checked'))
+				{
+					$("#getlastspectrum-container").html(JSON.stringify(data, null, 2));
+				}
+				
+				$("#answer-getlastspectrum-time").html(nowString());
+			
+			}			
+		});
+	//}
+}
+</script>
+
+</body>
+</html>
