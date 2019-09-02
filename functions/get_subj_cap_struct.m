@@ -1,6 +1,6 @@
 function structure = get_subj_cap_struct()
 %% getting root folder
-root_add = uigetdir('./','Select root folder...');
+root_add = uigetdir('./','Select data root folder...');
 
 %% get structure of root folder (list of subjects)
 files = dir(root_add);
