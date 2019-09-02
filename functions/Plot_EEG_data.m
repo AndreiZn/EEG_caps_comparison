@@ -1,6 +1,6 @@
 function Plot_EEG_data(EEG, conf)
     srate = EEG.srate;
-    eegplot('noui', EEG.data, 'winlength', size(EEG.data,2)/srate, 'srate', srate, 'spacing', max(mean(EEG.data,2) + 3*std(EEG.data,[],2)), 'eloc_file', conf.channel_location_file);
+    eegplot('noui', EEG.data, 'winlength', size(EEG.data,2)/srate, 'srate', srate, 'spacing', max(mean(EEG.data,2) + 6*std(EEG.data,[],2)), 'eloc_file', conf.channel_location_file);
     fig = gcf;
     chldrn = fig.Children; 
     ax = chldrn(3);
