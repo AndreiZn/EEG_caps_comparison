@@ -8,3 +8,4 @@ if ~exist(conf.output_dir, 'dir')
     mkdir(conf.output_dir)
 end
 Plot_EEG_data(EEG, conf);
+Plot_spectopo(EEG, conf);

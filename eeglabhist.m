@@ -1,4 +1,4 @@
-% EEGLAB history file generated on the 02-Sep-2019
+% EEGLAB history file generated on the 03-Sep-2019
 % ------------------------------------------------
 
 EEG.etc.eeglabvers = '14.1.2'; % this tracks which version of EEGLAB is being used, you may ignore it
@@ -7,5 +7,6 @@ EEG.setname='ds';
 EEG = eeg_checkset( EEG );
 EEG = pop_select( EEG,'channel',[2:9] );
 EEG = eeg_checkset( EEG );
-pop_eegplot( EEG, 1, 1, 1);
-EEG = pop_rejchan(EEG, 'elec',[1:8] ,'threshold',1,'norm','on','measure','kurt');
+EEG = pop_loadset('filename','demo_ds.set','filepath','D:\\EEG_caps_comparison_main\\EEG_caps_comparison_code\\');
+EEG = eeg_checkset( EEG );
+EEG = pop_rejchan(EEG, 'elec',[1:8] ,'threshold',2,'norm','on','measure','spec','freqrange',[1 62.5] );

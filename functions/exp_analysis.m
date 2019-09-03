@@ -1,6 +1,7 @@
 function exp_analysis(y, conf)
 filename_split = split(conf.name, '_');
-conf.exp_num = filename_split{1};
+exp_num = filename_split{1};
+conf.exp_num = exp_num(1:4);
 if strcmp(conf.exp_num, 'Exp1')
     Exp1_Analysis(y, conf);
 end
