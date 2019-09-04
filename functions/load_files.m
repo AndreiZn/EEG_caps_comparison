@@ -4,7 +4,7 @@ conf_lb = {'name','sampling_rate','channel_location_file','time_step_to_plot',..
     'subject','curr_dev','curr_folder'};
 c = cell(length(conf_lb),1);
 conf = cell2struct(c,conf_lb);
-conf.time_step_to_plot = 5; % seconds
+conf.time_step_to_plot = 10; % seconds
  %% select channel location file
 fprintf('Choose channel location file for gNautilus');
 [name,path] = uigetfile({'*.ced;*.locs'},'Pick channel location file ...');
